@@ -1,4 +1,4 @@
-package com.example.blt;(bltActivity.java)
+package com.example.blt;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,15 +21,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.bluetooth.le.ScanCallback;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 public class bltActivity extends AppCompatActivity {
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private static final int REQUEST_COARSE_LOCATION_PERMISSION = 102;
     private static final int REQUEST_ENABLE_BT = 2;
+    private boolean isScanning = false;
+    ArrayList<Scan> findDevice = new ArrayList<>();
+    bltActivity mAdapter;
     boolean is_enable = true;
     BluetoothLeScanner mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
-    ArrayList<Scan> findDevice = new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -38,17 +42,23 @@ public class bltActivity extends AppCompatActivity {
         setTitle("BlueTooth lets go");
         setContentView(R.layout.activity_blt);
 
-        int locationPermission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
-        if (locationPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    REQUEST_COARSE_LOCATION_PERMISSION);
-        }
 
-        if(!mBluetoothAdapter.isEnabled()){
-         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent,REQUEST_ENABLE_BT);
-        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                Toast.makeText(this,"Not support Bluetooth", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            if(!mBluetoothAdapter.isEnabled()){
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent,REQUEST_ENABLE_BT);
+            }
+            int locationPermission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (locationPermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        REQUEST_COARSE_LOCATION_PERMISSION);
+            }
+        }else finish();
 
         Button scan_Button = (Button) findViewById(R.id.scan_Button);
         scan_Button.setOnClickListener(new View.OnClickListener() {
@@ -57,25 +67,24 @@ public class bltActivity extends AppCompatActivity {
                 if (is_enable == true) {
                     is_enable = false;
                     scan_Button.setText("Stop");
-                    //SwitchScan.setChecked(true);
                     boolean on = true;
                     if (on) {
                         mBluetoothLeScanner.startScan(startScanCallback);
                     }
                 } else {
                     is_enable = true;
-                    scan_Button.setText("Scan");
+                    scan_Button.setText("Start");
                     boolean on = false;
+                    //SwitchScan.setChecked(false);
                     if (!on) {
                         mBluetoothLeScanner.stopScan(startScanCallback);
                     }
+                    //SwitchScan.setEnabled(is_enable);
                 }
             }
         });
 
-
-        }
-
+    }
 
 
     // Disable back button
@@ -94,18 +103,6 @@ public class bltActivity extends AppCompatActivity {
             byte[] content = mScanRecord.getBytes();
             int mRssi = result.getRssi();
         }
-        /*@Override
-        public boolean equals(@Nullable Object obj) {
-            Scan p = (Scan)obj;
-
-            return address.equals(p.address);
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return address;
-        }*/
     };
 
 }
