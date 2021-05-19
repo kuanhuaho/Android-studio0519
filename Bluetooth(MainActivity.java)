@@ -1,4 +1,4 @@
-package com.example.blt;(MainActivity.java)
+package com.example.blt;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -35,7 +35,3 @@ public class MainActivity extends AppCompatActivity {
 
     }
 }
-
-
-
-
