@@ -52,6 +52,7 @@ public class bltActivity extends AppCompatActivity {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent,REQUEST_ENABLE_BT);
             }
+
             int locationPermission = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (locationPermission != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(
@@ -59,6 +60,11 @@ public class bltActivity extends AppCompatActivity {
                         REQUEST_COARSE_LOCATION_PERMISSION);
             }
         }else finish();
+        bluetoothScan();
+        onBackPressed();
+    }
+
+    private void bluetoothScan(){
 
         Button scan_Button = (Button) findViewById(R.id.scan_Button);
         scan_Button.setOnClickListener(new View.OnClickListener() {
@@ -75,17 +81,14 @@ public class bltActivity extends AppCompatActivity {
                     is_enable = true;
                     scan_Button.setText("Start");
                     boolean on = false;
-                    //SwitchScan.setChecked(false);
                     if (!on) {
                         mBluetoothLeScanner.stopScan(startScanCallback);
                     }
-                    //SwitchScan.setEnabled(is_enable);
                 }
             }
         });
 
     }
-
 
     // Disable back button
     @Override
